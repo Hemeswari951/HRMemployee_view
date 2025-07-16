@@ -1,249 +1,129 @@
+
 import 'package:flutter/material.dart';
-import 'employee_dashboard.dart';
-import 'employee_profile.dart';
-import 'employee_directory.dart';
-import 'reports.dart';
-import 'leave_management.dart';
-import 'notification.dart';
-import 'emp_payroll.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'sidebar.dart';
 
-void main() => runApp(Performance());
+class Performance extends StatefulWidget {
+  const Performance({super.key});
 
+  @override
+  State<Performance> createState() => _PerformanceState();
+}
 
+class _PerformanceState extends State<Performance> {
+  List<dynamic> performanceData = [];
+  bool isLoading = true;
+  String errorMsg = '';
 
-class Performance extends StatelessWidget {
-  final Color darkBlue = Color(0xFF0E0E2C);
-  final Color sidebarGray = Color(0xFFE9E9E9);
+  @override
+  void initState() {
+    super.initState();
+    fetchPerformanceData();
+  }
+
+  Future<void> fetchPerformanceData() async {
+    var url = Uri.parse('http://localhost:5000/perform/performance/all');
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        setState(() {
+          performanceData = jsonDecode(response.body);
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMsg = '❌ Error fetching data: ${response.statusCode}';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMsg = '❌ Network error: $e';
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: darkBlue,
-      body: Row(
+    return Sidebar(
+      title: 'HR Performance Reviews',
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : errorMsg.isNotEmpty
+              ? Center(child: Text(errorMsg))
+              : ListView.builder(
+                  itemCount: performanceData.length,
+                  itemBuilder: (context, index) {
+                    return buildPerformanceCard(performanceData[index]);
+                  },
+                ),
+    );
+  }
+
+  Widget buildPerformanceCard(Map<String, dynamic> data) {
+    Color topColor;
+
+    switch (data['overallStatus'].toString().toLowerCase()) {
+      case 'red':
+        topColor = Colors.red;
+        break;
+      case 'yellow':
+        topColor = Colors.amber;
+        break;
+      case 'green':
+        topColor = Colors.green;
+        break;
+      default:
+        topColor = Colors.grey;
+    }
+
+    return Container(
+      margin: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(color: Colors.grey.shade300, blurRadius: 4, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Sidebar
-         Container(
-            width: 200,
-            color: sidebarGray,
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      CircleAvatar(radius: 30, backgroundColor: Colors.grey),
-                      SizedBox(height: 8),
-                      Text(
-                        "Anitha",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text("Employee\nTech", textAlign: TextAlign.center),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      sidebarItem(
-                        context,
-                        Icons.dashboard,
-                        "Dashboard",
-                        const EmployeeDashboard(),
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.calendar_today,
-                        "Leave Management",
-                          LeaveManagement(), // Not yet implemented
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.money,
-                        "Payroll Management",
-                          EmpPayroll(),
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.fingerprint,
-                        "Attendance system",
-                         null,
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.bar_chart,
-                        "Reports & Analytics",
-                        ReportsAnalyticsPage(),
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.group,
-                        "Employee Directory",
-                          EmployeeDirectoryApp(),
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.notifications,
-                        "Notifications",
-                         NotificationsPage(),
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.person_2_outlined,
-                        "Employee profile",
-                          EmployeeProfilePage(),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+          Container(
+            height: 20,
+            decoration: BoxDecoration(
+              color: topColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(8),
+                topRight: Radius.circular(8),
+              ),
             ),
           ),
-          // Main Content
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top Bar
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Image.asset('assets/logo_z.png', height: 40, width: 40),
-                        const Spacer(),
-                        Image.asset(
-                          'assets/logo_zeai.png',
-                          height: 100,
-                          width: 100,
-                        ),
-                        const Spacer(),
-                        Container(
-                          width: 250,
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white24,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search, color: Colors.white),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: TextField(
-                                  style: TextStyle(color: Colors.white),
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: "Search here..",
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 32),
-                    // Title & Flags
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white24,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: Text(
-                            "Performance Review",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                flagDot(Colors.green),
-                                Text(
-                                  "  Green Flag",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                flagDot(Colors.yellow),
-                                Text(
-                                  "  Yellow Flag",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                flagDot(Colors.red),
-                                Text(
-                                  "  Red Flag",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 32),
-                    reviewField("Communication"),
-                    reviewField("Attitude"),
-                    reviewField("Technical knowledge"),
-                    reviewField("Business"),
-                    SizedBox(height: 20),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                          ),
-                          child: Text("Agree"),
-                        ),
-                        SizedBox(width: 20),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                          ),
-                          child: Text("Disagree"),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "Reviewed by",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            "Hari Baskaran",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${data['employeeName']} - ${data['month']}',
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-              ),
+                const Divider(),
+
+                buildSection('Communication', data['communication']),
+                buildSection('Attitude', data['attitude']),
+                buildSection('Technical Knowledge', data['technicalKnowledge']),
+                buildSection('Business Knowledge', data['businessKnowledge']),
+
+                const SizedBox(height: 10),
+                Text('Overall Comment:\n${data['overallComment']}', style: const TextStyle(fontSize: 14)),
+                const SizedBox(height: 6),
+                Text('Reviewed by: ${data['reviewer']}'),
+              ],
             ),
           ),
         ],
@@ -251,80 +131,20 @@ class Performance extends StatelessWidget {
     );
   }
 
-Widget sidebarItem(
-  BuildContext context,
-  IconData icon,
-  String title,
-  Widget? page, // Nullable
-) {
-  return ListTile(
-    leading: Icon(icon, color: Colors.black),
-    title: Text(title, style: TextStyle(fontSize: 14)),
-    onTap: () {
-      if (page != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => page),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$title page is under construction')),
-        );
-      }
-    },
-  );
-}
-
-  Widget reviewField(String label) {
+  Widget buildSection(String title, String content) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "$label:",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 8),
-          TextField(
-            decoration: InputDecoration(
-              hintText: "Text field for $label",
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
+          const SizedBox(height: 4),
+          Text(content),
         ],
       ),
-    );
-  }
-
-  Widget flagDot(Color color) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 2),
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
-  }
-}
-
-class ExamplePage extends StatelessWidget {
-  final String title;
-
-  const ExamplePage({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title), backgroundColor: Color(0xFF0E0E2C)),
-      body: Center(child: Text('$title Page', style: TextStyle(fontSize: 24))),
     );
   }
 }

@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:provider/provider.dart';
 import 'employee_dashboard.dart';
-
-void main() {
-  runApp(const LoginApp());
-}
+import 'user_provider.dart';
 
 class LoginApp extends StatelessWidget {
   const LoginApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Login Page',
-      home: const LoginPage(),
-    );
+    return const LoginPage();
   }
 }
 
@@ -27,8 +23,107 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController employeeIdController = TextEditingController();
+  final TextEditingController employeeNameController = TextEditingController();
+  final TextEditingController positionController = TextEditingController();
+
+  bool isLoading = false;
+
+  Future<void> sendLoginDetails() async {
+    if (employeeIdController.text.isEmpty ||
+        employeeNameController.text.isEmpty ||
+        positionController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Missing Details"),
+          content: const Text("Please fill all fields."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:5000/employee-login'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'employeeId': employeeIdController.text.trim(),
+          'employeeName': employeeNameController.text.trim(),
+          'position': positionController.text.trim(),
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        print('✅ Login Successful');
+
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setEmployeeId(employeeIdController.text.trim());
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const EmployeeDashboard()),
+        );
+      } else if (response.statusCode == 400 || response.statusCode == 401) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Invalid Credentials ❌"),
+            content: const Text("Please check your Employee ID, Name, or Position."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Server Error"),
+            content: Text("Status Code: ${response.statusCode}"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print('❌ Network Error: $e');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Network Error"),
+          content: Text("Error: $e"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
 
           return Column(
             children: [
-              // Top navbar
+              // ✅ Top Navbar (Search bar removed)
               Container(
                 height: 80,
                 decoration: const BoxDecoration(
@@ -56,83 +151,34 @@ class _LoginPageState extends State<LoginPage> {
                 child: Row(
                   children: [
                     const SizedBox(width: 16),
-                    const FaIcon(
-                      FontAwesomeIcons.chevronLeft,
-                      color: Colors.white,
-                      size: 30,
-                    ),
+                    const FaIcon(FontAwesomeIcons.chevronLeft, color: Colors.white, size: 30),
                     const SizedBox(width: 16),
-                    const FaIcon(
-                      FontAwesomeIcons.chevronRight,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-
+                    const FaIcon(FontAwesomeIcons.chevronRight, color: Colors.white, size: 30),
                     const SizedBox(width: 18),
-                    const Image(
-                      image: AssetImage('assets/png-z.png'),
-                      width: 40,
-                      height: 40,
-                    ),
+                    const Image(image: AssetImage('assets/logo_z.png'), width: 40, height: 40),
                     const SizedBox(width: 70),
                     const Spacer(),
-                    const Image(
-                      image: AssetImage('assets/png2.png'),
-                      width: 140,
-                      height: 140,
-                    ),
+                    const Image(image: AssetImage('assets/logo_zeai.png'), width: 140, height: 140),
                     const Spacer(),
-                    Container(
-                      width: 300,
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: TextField(
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: 'Search here..',
-                          hintStyle: const TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          filled: true,
-                          fillColor: const Color(0xFF2C2C3E),
-                          suffixIcon: const Icon(
-                            FontAwesomeIcons.magnifyingGlass,
-                            color: Colors.white,
-                          ),
-                          contentPadding: const EdgeInsets.only(
-                            left: 20,
-                            top: 16,
-                            bottom: 16,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                    ),
                     const SizedBox(width: 16),
                   ],
                 ),
               ),
 
-              // Main Body
+              // ✅ Main Body
               Expanded(
                 child: Center(
                   child: SingleChildScrollView(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Image
                         Image.asset(
                           'assets/png1.png',
                           width: imageWidth,
                           height: 350,
                         ),
-
                         SizedBox(width: spacing),
 
-                        // Login Box
                         Container(
                           width: loginBoxWidth,
                           padding: const EdgeInsets.all(24),
@@ -159,54 +205,37 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               const SizedBox(height: 24),
-
-                              // Employee ID
-                              buildTextFieldRow('Employee ID :', 'Enter_id'),
-
+                              buildTextFieldRow('Employee ID :', 'Enter_id', employeeIdController),
                               const SizedBox(height: 16),
-
-                              // Employee Name
-                              buildTextFieldRow(
-                                'Employee Name :',
-                                'Enter_Name',
-                              ),
-
+                              buildTextFieldRow('Employee Name :', 'Enter_Name', employeeNameController),
                               const SizedBox(height: 16),
-
-                              // Position
-                              buildTextFieldRow('Position :', 'Enter_position'),
-
+                              buildTextFieldRow('Position :', 'Enter_position', positionController),
                               const SizedBox(height: 30),
 
-                              // Login Button
                               SizedBox(
                                 width: 100,
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            EmployeeDashboard(),
-                                      ),
-                                    );
-                                  },
+                                  onPressed: isLoading ? null : sendLoginDetails,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF171A30),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 20,
-                                    ),
+                                    padding: const EdgeInsets.symmetric(vertical: 20),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text(
-                                    'Login',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Text(
+                                          'Login',
+                                          style: TextStyle(fontSize: 16, color: Colors.white),
+                                        ),
                                 ),
                               ),
                             ],
@@ -224,8 +253,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Helper method to build each TextField row
-  Widget buildTextFieldRow(String label, String hint) {
+  Widget buildTextFieldRow(String label, String hint, TextEditingController controller) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -241,6 +269,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         Expanded(
           child: TextField(
+            controller: controller,
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color.fromRGBO(53, 64, 85, 0.77),

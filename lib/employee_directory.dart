@@ -1,297 +1,170 @@
 import 'package:flutter/material.dart';
-import 'employee_dashboard.dart';
-import 'leave_management.dart';
-import 'emp_payroll.dart';
-import 'employee_profile.dart';
-import 'reports.dart';
-import 'notification.dart';
-
-
-void main() => runApp(EmployeeDirectoryApp());
-
-class EmployeeDirectoryApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Employee Directory',
-      debugShowCheckedModeBanner: false,
-      home: EmployeeDirectoryPage(),
-    );
-  }
-}
+import 'sidebar.dart';
 
 class EmployeeDirectoryPage extends StatefulWidget {
   @override
-  _EmployeeDirectoryPageState createState() => _EmployeeDirectoryPageState();
+  EmployeeDirectoryPageState createState() => EmployeeDirectoryPageState();
 }
 
-class _EmployeeDirectoryPageState extends State<EmployeeDirectoryPage> {
-  final Color darkBlue = Color(0xFF0E0E2C);
-  final Color sidebarGray = Color(0xFFE9E9E9);
-
+class EmployeeDirectoryPageState extends State<EmployeeDirectoryPage> {
   final List<Map<String, String>> employees = [
-    {'name': 'Anitha', 'role': 'UI Developer'},
-    {'name': 'Uday', 'role': 'UI Developer'},
-    {'name': 'Sanjay', 'role': 'UI Developer'},
-    {'name': 'Harika', 'role': 'UI Developer'},
-    {'name': 'Bhanu', 'role': 'UI Developer'},
-    {'name': 'Sunil', 'role': 'UI Developer'},
-    {'name': 'Anil', 'role': 'UI Developer'},
-    {'name': 'Balu', 'role': 'UI Developer'},
+    {
+      'name': 'D.Hemeswari',
+      'role': 'Tech Trainee',
+      'image': 'assets/emp-directory/Hemeswari D-Tech Trainee.jpg',
+    },
+    {
+      'name': 'B.Hariprasad',
+      'role': 'Tech Trainee',
+      'image': 'assets/emp-directory/Hariprasad B-Tech Trainee.jpg',
+    },
+    {
+      'name': 'K.Karthick',
+      'role': 'Tech Trainee',
+      'image': 'assets/emp-directory/Karthick K-Tech Trainee.jpg',
+    },
+    {
+      'name': 'M.Udaykiran',
+      'role': 'Tech Trainee',
+      'image': 'assets/emp-directory/Uday kiran M - Tech Trainee.jpg',
+    },
+    {
+      'name': 'K.Karthik',
+      'role': 'BDE',
+      'image': 'assets/emp-directory/Karthik K - BDE.jpg',
+    },
+    {
+      'name': 'Vishal',
+      'role': 'UXD',
+      'image': 'assets/emp-directory/Vishal - UXD - Intern.jpg',
+    },
   ];
-
-  String selectedPage = 'Directory';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: darkBlue,
-      body: Row(
-        children: [
-          // Sidebar
-          Container(
-            width: 160,
-            color: sidebarGray,
-            child: Column(
+    return Sidebar(
+      title: 'Employee Directory',
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            // Search + Button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: EdgeInsets.all(12),
-                  child: Column(
-                    children: [
-                      CircleAvatar(radius: 24, backgroundColor: Colors.grey),
-                      SizedBox(height: 6),
-                      Text(
-                        "Anitha",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        "Employee\nTech",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 10),
-                      ),
-                    ],
+                _searchBox('Search employee...', 200),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white24,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                   ),
-                ),
-                 Expanded(
-                  child: ListView(
-                    children: [
-                      sidebarItem(
-                        context,
-                        Icons.dashboard,
-                        "Dashboard",
-                        const EmployeeDashboard(),
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.calendar_today,
-                        "Leave Management",
-                        LeaveManagement(), // Not yet implemented
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.money,
-                        "Payroll Management",
-                        EmpPayroll(),
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.fingerprint,
-                        "Attendance system",
-                         null,
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.bar_chart,
-                        "Reports & Analytics",
-                          ReportsAnalyticsPage(),
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.group,
-                        "Employee Directory",
-                          null,
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.notifications,
-                        "Notifications",
-                         NotificationsPage(),
-                      ),
-                      sidebarItem(
-                        context,
-                        Icons.person_2_outlined,
-                        "Employee profile",
-                        EmployeeProfilePage(),
-                      ),
-                    ],
+                  child: const Text(
+                    "Employee List",
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
             ),
-          ),
-          // Main Content
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  // Header Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(width: 10),
-                      Image.asset('assets/logo_z.png', height: 40, width: 40),
-                      const Spacer(),
-                      Image.asset(
-                        'assets/logo_zeai.png',
-                        height: 100,
-                        width: 100,
-                      ),
-                      const Spacer(),
-                      searchBox("Search here...", width: 180),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  // Sub-header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      searchBox("Search employee...", width: 180),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white24,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: Text(
-                          "Employee list",
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  // Dynamic content
-                  Expanded(child: buildPageContent()),
-                ],
+            const SizedBox(height: 20),
+
+            // ✅ Scrollable Grid of Employee Cards
+            Expanded(
+              child: GridView.builder(
+                itemCount: employees.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.95, // Shorter cards
+                ),
+                itemBuilder: (context, index) {
+                  final emp = employees[index];
+                  return _employeeCard(
+                    emp['name']!,
+                    emp['role']!,
+                    emp['image']!,
+                  );
+                },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-
-Widget sidebarItem(
-  BuildContext context,
-  IconData icon,
-  String title,
-  Widget? page, // Nullable
-) {
-  return ListTile(
-    leading: Icon(icon, color: Colors.black),
-    title: Text(title, style: TextStyle(fontSize: 14)),
-    onTap: () {
-      if (page != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => page),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$title page is under construction')),
-        );
-      }
-    },
-  );
-}
-
-
-  Widget searchBox(String hint, {double width = 180}) {
-    return Container(
-      width: width,
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white24,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.search, color: Colors.white, size: 18),
-          SizedBox(width: 6),
-          Expanded(
-            child: TextField(
-              style: TextStyle(color: Colors.white, fontSize: 12),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: hint,
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildPageContent() {
-    if (selectedPage == 'Directory') {
-      return GridView.builder(
-        itemCount: employees.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1,
-        ),
-        itemBuilder: (context, index) {
-          final emp = employees[index];
-          return employeeCard(emp['name']!, emp['role']!);
-        },
-      );
-    } else {
-      return Center(
-        child: Text(
-          '$selectedPage Page',
-          style: TextStyle(color: Colors.white, fontSize: 18),
-        ),
-      );
-    }
-  }
-
-  Widget employeeCard(String name, String role) {
+  // ✅ Employee Card with updated height & avatar size
+  Widget _employeeCard(String name, String role, String imagePath) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(Icons.person, size: 30),
-            SizedBox(height: 6),
+            CircleAvatar(
+              radius: 80, // Increased from 40 to 45
+              backgroundColor: Colors.grey[200],
+              backgroundImage: AssetImage(imagePath),
+              onBackgroundImageError: (_, __) {
+                debugPrint('Image load error for $imagePath');
+              },
+            ),
+            const SizedBox(height: 8),
             Text(
               name,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13.5,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
             ),
-            Text(role, style: TextStyle(color: Colors.black87, fontSize: 10)),
-            Spacer(),
-            Wrap(
-              spacing: 4,
-              children: [
-                Icon(Icons.email, size: 12),
-                Icon(Icons.message, size: 12),
-                Icon(Icons.phone, size: 12),
-                Icon(Icons.video_call, size: 12),
-                Icon(Icons.info, size: 12),
+            Text(
+              role,
+              style: const TextStyle(
+                fontSize: 15.5,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Icon(Icons.email, size: 25, color: Colors.deepPurple),
+                Icon(Icons.message, size: 25, color: Colors.deepPurple),
+                Icon(Icons.phone, size: 25, color: Colors.deepPurple),
+                Icon(Icons.video_call, size: 25, color: Colors.deepPurple),
+                Icon(Icons.info_outline, size: 25, color: Colors.deepPurple),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // ✅ Search Box
+  Widget _searchBox(String hint, double width) {
+    return SizedBox(
+      width: width,
+      child: TextField(
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: Colors.white70),
+          prefixIcon: const Icon(Icons.search, color: Colors.white70),
+          filled: true,
+          fillColor: const Color(0xFF2D2F41),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );
