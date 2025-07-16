@@ -21,6 +21,7 @@ app.use((req, res, next) => {
 app.use(cors());
 app.use(express.json());
 
+
 // -----------------------------
 // 🛠️ MongoDB Connection
 // -----------------------------
@@ -171,10 +172,20 @@ app.get('/get-employee-name/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+// 👤 Employee Login Routes
+// (your existing routes here...)
 
-// -----------------------------
+app.get('/get-employee-name/:employeeId', async (req, res) => {
+  // (existing handler...)
+});
+
+// 🏠 Default root route
+app.get('/', (req, res) => {
+  res.send('✅ HRM Backend is up and running!');
+});
+
 // 🚀 Start Server
-// -----------------------------
 app.listen(PORT, () =>
   console.log(`🚀 Server running at: http://localhost:${PORT}`)
 );
+
