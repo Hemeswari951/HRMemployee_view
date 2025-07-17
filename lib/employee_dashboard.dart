@@ -36,7 +36,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:5000/get-employee-name/$employeeId'), // replace with your actual IP in real devices
+        Uri.parse('http://employee-backend.onrender.com/get-employee-name/$employeeId'), // replace with your actual IP in real devices
       );
 
       if (response.statusCode == 200) {

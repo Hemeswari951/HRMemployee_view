@@ -43,7 +43,7 @@ class _SidebarState extends State<Sidebar> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:5000/get-employee-name/$employeeId'),
+        Uri.parse('http://employee-backend.onrender.com/get-employee-name/$employeeId'),
       );
 
       if (response.statusCode == 200) {

@@ -40,7 +40,7 @@ class _LeaveManagementState extends State<LeaveManagement> {
       throw Exception("Employee ID not found");
     }
 
-    final String fetchUrl = 'http://localhost:5000/apply/fetch/$employeeId?status=Pending';
+    final String fetchUrl = 'http://employee-backend.onrender.com/apply/fetch/$employeeId?status=Pending';
     final response = await http.get(Uri.parse(fetchUrl));
 
     if (response.statusCode == 200) {
@@ -54,7 +54,7 @@ class _LeaveManagementState extends State<LeaveManagement> {
   Future<void> _cancelLeave(String leaveId) async {
     if (employeeId == null) return;
 
-    final String deleteUrl = 'http://localhost:5000/apply/delete/$employeeId/$leaveId';
+    final String deleteUrl = 'http://employee-backend.onrender.com/apply/delete/$employeeId/$leaveId';
     print('🔗 Deleting leave via: $deleteUrl');
 
     final response = await http.delete(Uri.parse(deleteUrl));

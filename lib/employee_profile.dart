@@ -37,7 +37,7 @@ class _EmployeeProfilePageState extends State<EmployeeProfilePage> {
       return;
     }
 
-    final response = await http.get(Uri.parse('http://localhost:5000/profile/$employeeId'));
+    final response = await http.get(Uri.parse('http://employee-backend.onrender.com/profile/$employeeId'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);

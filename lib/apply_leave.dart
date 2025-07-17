@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'user_provider.dart';
 import 'sidebar.dart';
 import 'leave_management.dart';
+const String baseUrl = 'https://employee-backend.onrender.com';
 
 class ApplyLeave extends StatefulWidget {
   final Map<String, dynamic>? existingLeave;
@@ -44,8 +45,14 @@ class _ApplyLeaveState extends State<ApplyLeave> {
   Future<void> fetchEmployeeName(String employeeId) async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:5000/get-employee-name/$employeeId'),
+        //Uri.parse('http://localhost:5000/get-employee-name/$employeeId'),
+       // var url = 'https://hrmemployee-view.onrender.com/api/employees';
+       Uri.parse('https://employee-backend.onrender.com/get-employee-name/$employeeId')
+      
+      
       );
+
+      print("🔎 Sending employeeId: $employeeId");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -105,9 +112,10 @@ class _ApplyLeaveState extends State<ApplyLeave> {
     final isEditing = widget.existingLeave != null;
     final leaveId = widget.existingLeave?['_id'];
     final url = isEditing
-        ? 'http://localhost:5000/apply/update/$employeeId/$leaveId'
-        : 'http://localhost:5000/apply/apply-leave';
-
+       // ? 'http://localhost:5000/apply/update/$employeeId/$leaveId'
+        //: 'http://localhost:5000/apply/apply-leave';
+? 'http://localhost:5000/apply/update/$employeeId/$leaveId'
+: 'http://localhost:5000/apply/apply-leave';
     final response = await (isEditing
         ? http.put(Uri.parse(url), headers: {"Content-Type": "application/json"}, body: jsonEncode(leaveData))
         : http.post(Uri.parse(url), headers: {"Content-Type": "application/json"}, body: jsonEncode(leaveData)));

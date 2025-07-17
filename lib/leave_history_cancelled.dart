@@ -18,7 +18,7 @@ class LeaveHistoryCancelled extends StatefulWidget {
 class _LeaveHistoryCancelledState extends State<LeaveHistoryCancelled> {
   late Future<List<Map<String, dynamic>>> _cancelledLeavesFuture;
 
-  static const String baseUrl = 'http://localhost:5000/apply/fetch';
+  static const String baseUrl = 'http://employee-backend.onrender.com/apply/fetch';
 
   @override
   void initState() {

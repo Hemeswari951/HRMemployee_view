@@ -49,7 +49,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   Future<void> postAttendanceData() async {
     final employeeId = Provider.of<UserProvider>(context, listen: false).employeeId ?? '';
-    var url = Uri.parse('http://localhost:5000/attendance/attendance/mark/$employeeId');
+    var url = Uri.parse('http://employee-backend.onrender.com/attendance/attendance/mark/$employeeId');
 
     var body = {
       'date': getCurrentDate(),
@@ -82,7 +82,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   Future<void> updateAttendanceData() async {
     final employeeId = Provider.of<UserProvider>(context, listen: false).employeeId ?? '';
-    var url = Uri.parse('http://localhost:5000/attendance/attendance/update/$employeeId');
+    var url = Uri.parse('http://employee-backend.onrender.com/attendance/attendance/update/$employeeId');
 
     var body = {
       'date': getCurrentDate(),
@@ -115,7 +115,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Future<void> fetchAttendanceHistory() async {
     try {
       final employeeId = Provider.of<UserProvider>(context, listen: false).employeeId ?? '';
-      var url = Uri.parse('http://localhost:5000/attendance/attendance/history/$employeeId');
+      var url = Uri.parse('http://employee-backend.onrender.com/attendance/attendance/history/$employeeId');
       var response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -206,7 +206,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   final todayDate = getCurrentDate();
 
   // Step 1: Check if already logged in for today
-  final checkUrl = Uri.parse('http://localhost:5000/attendance/attendance/check/$employeeId/$todayDate');
+  final checkUrl = Uri.parse('http://employee-backend.onrender.com/attendance/attendance/check/$employeeId/$todayDate');
   try {
     final response = await http.get(checkUrl);
     if (response.statusCode == 200) {

@@ -1,9 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'attendance_status.dart';
-import 'sidebar.dart'; // ✅ Reusable sidebar layout
+import 'sidebar.dart';
+import 'package:provider/provider.dart';
+import 'user_provider.dart';
 
 class AttendanceLoginPage extends StatelessWidget {
   const AttendanceLoginPage({super.key});
+
+  // Replace this with your Render backend URL
+  final String baseUrl = 'https://employee-backend.onrender.com';
+
+  Future<void> markAttendance({
+    required BuildContext context,
+    required String status,
+  }) async {
+    final employeeId = Provider.of<UserProvider>(context, listen: false).employeeId;
+
+    if (employeeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('❌ Employee ID not found'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    final Uri url = Uri.parse('$baseUrl/attendance/mark');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'employeeId': employeeId,
+          'status': status, // "login" or "logout"
+          'timestamp': DateTime.now().toIso8601String(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('✅ Marked $status successfully'), backgroundColor: Colors.green),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('❌ Failed: ${response.body}'), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('❌ Error: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,16 +108,15 @@ class AttendanceLoginPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 60),
-
-                // LOGIN & LOGOUT buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        await markAttendance(context: context, status: 'login');
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => AttendanceScreen()),
+                          MaterialPageRoute(builder: (_) => const AttendanceScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -97,8 +146,8 @@ class AttendanceLoginPage extends StatelessWidget {
                     ),
                     const SizedBox(width: 30),
                     ElevatedButton(
-                      onPressed: () {
-                        // Add logout logic here if needed
+                      onPressed: () async {
+                        await markAttendance(context: context, status: 'logout');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,

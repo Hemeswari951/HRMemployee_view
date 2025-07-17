@@ -29,7 +29,7 @@ class _ReportsAnalyticsPageState extends State<ReportsAnalyticsPage> {
 
   Future<void> fetchPerformanceReviews() async {
     //var url = Uri.parse('http://localhost:5000/perform/performance/list');
-    var url = Uri.parse('http://192.168.1.35:5000/perform/performance/list');
+    var url = Uri.parse('http://employee-backend.onrender.com/perform/performance/list');
     try {
       var response = await http.get(url);
       if (response.statusCode == 200) {
@@ -46,7 +46,7 @@ class _ReportsAnalyticsPageState extends State<ReportsAnalyticsPage> {
 
   Future<void> fetchWorkProgress() async {
     //var url = Uri.parse('http://localhost:5000/todo_planner/todo/progress');
-    var url = Uri.parse('http://192.168.1.35:5000/todo_planner/todo/progress');
+    var url = Uri.parse('http://employee-backend.onrender.com/todo_planner/todo/progress');
     try {
       var response = await http.get(url);
       if (response.statusCode == 200) {
@@ -64,7 +64,7 @@ class _ReportsAnalyticsPageState extends State<ReportsAnalyticsPage> {
 
   Future<void> fetchLeaveStats() async {
     //var url = Uri.parse('http://localhost:5000/apply/leave-stats');
-    var url = Uri.parse('http://192.168.1.35:5000/apply/leave-stats');
+    var url = Uri.parse('http://employee-backend.onrender.com/apply/leave-stats');
     try {
       var response = await http.get(url);
       if (response.statusCode == 200) {

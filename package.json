@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/Hemeswari951/HRMemployee_view/issues"
   },
-  "homepage": "https://github.com/Hemeswari951/HRMemployee_view#readme"
+  "homepage": "https://github.com/Hemeswari951/HRMemployee_view#readme",
+  "dependencies": {
+    "cors": "^2.8.5"
+  }
 }
